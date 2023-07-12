@@ -43,6 +43,7 @@ func scrapeVopiceEvents(url string, eventChan chan<- event) (err error) {
 			log.Infof("Cannot parse datetime: %s\n", date)
 		}
 		desc := s.Find(".tribe-events-list-event-description p").Text()
+		desc = strings.Replace(strings.TrimSpace(desc), "\n", "\n\n", -1) //? sanitize description by removing trailing spaces and empty lines
 		score := strings.Count(desc, "black")
 		if score > 1 {
 			eventChan <- event{title: title, date: dateParsed, desc: desc, score: score, venue: "Modrá vopice"}

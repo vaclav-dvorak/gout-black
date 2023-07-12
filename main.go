@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -78,7 +79,7 @@ func main() {
 		})
 	}
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 4, WidthMax: 100},
+		{Number: 4, WidthMax: 100, WidthMaxEnforcer: text.WrapSoft},
 	})
 	t.SortBy([]table.SortBy{
 		{Name: "date", Mode: table.Asc},
