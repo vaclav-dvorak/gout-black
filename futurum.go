@@ -44,22 +44,22 @@ func seedFuturum(in chan<- scrapeOrder) (err error) {
 	return
 }
 
-func scrapeFuturumEvents(url string, eventChan chan<- event) (events []event, err error) {
+func scrapeFuturumEvents(url string, eventChan chan<- event) (err error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	req.Header.Set("User-Agent", "ScraperBot - We read events once a day")
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
 	title := doc.Find(".single-blok h1").Text()
@@ -69,6 +69,7 @@ func scrapeFuturumEvents(url string, eventChan chan<- event) (events []event, er
 		log.Infof("Cannot parse datetime: %s\n", date)
 	}
 	desc := doc.Find(".event_content").Text()
+	desc = strings.Replace(strings.TrimSpace(desc), "\n\n", "\n", -1) //? sanitize description by removing trailing spaces and empty lines
 	score := strings.Count(desc, "black")
 	if score > 1 {
 		eventChan <- event{title: title, date: dateParsed, desc: desc, score: score, venue: "Futurum musicbar"}

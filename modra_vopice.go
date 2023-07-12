@@ -18,24 +18,21 @@ func seedVopice(in chan<- scrapeOrder) (err error) {
 	return
 }
 
-func scrapeVopiceEvents(url string, eventChan chan<- event) (events []event, err error) {
-	req, terr := http.NewRequest(http.MethodGet, url, nil)
-	if terr != nil {
-		err = terr
+func scrapeVopiceEvents(url string, eventChan chan<- event) (err error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
 		return
 	}
 	req.Header.Set("User-Agent", "ScraperBot - We read events once a day")
 
 	client := &http.Client{}
 	res, err := client.Do(req)
-	if terr != nil {
-		err = terr
+	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	doc, terr := goquery.NewDocumentFromReader(res.Body)
-	if terr != nil {
-		err = terr
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
 		return
 	}
 	doc.Find("#tribe-events-content .type-tribe_events").Each(func(i int, s *goquery.Selection) {

@@ -27,7 +27,7 @@ type event struct {
 
 type scrapeOrder struct {
 	url      string
-	scrapper func(url string, output chan<- event) ([]event, error)
+	scrapper func(url string, output chan<- event) error
 	title    string
 }
 
@@ -36,7 +36,9 @@ func scrape(in <-chan scrapeOrder, out chan<- event) {
 	for input := range in {
 		start := time.Now()
 		log.Info("Request - " + input.title)
-		input.scrapper(input.url, out)
+		if err := input.scrapper(input.url, out); err != nil {
+			log.Fatal(err)
+		}
 		log.Infof("Request - %s - done - took %s", input.title, time.Since(start))
 	}
 }
@@ -58,7 +60,9 @@ func main() {
 
 	seeders := []func(chan<- scrapeOrder) error{seedVopice, seedFuturum, seedUnderdogs, seedAkropolis}
 	for _, seeder := range seeders {
-		seeder(bufScrapeOrder)
+		if err := seeder(bufScrapeOrder); err != nil {
+			log.Fatal(err)
+		}
 	}
 	close(bufScrapeOrder)
 
@@ -73,6 +77,13 @@ func main() {
 			v.date.Format("02.01.2006"), v.venue, v.title, v.desc, v.score,
 		})
 	}
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 4, WidthMax: 100},
+	})
+	t.SortBy([]table.SortBy{
+		{Name: "date", Mode: table.Asc},
+		{Name: "score", Mode: table.Dsc},
+	})
 	t.SetStyle(table.StyleLight)
 	t.Render()
 }
