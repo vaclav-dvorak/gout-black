@@ -79,7 +79,7 @@ func main() {
 		})
 	}
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 4, WidthMax: 100, WidthMaxEnforcer: text.WrapSoft},
+		{Number: 4, WidthMax: 90, WidthMaxEnforcer: text.WrapSoft},
 	})
 	t.SortBy([]table.SortBy{
 		{Name: "date", Mode: table.Asc},
